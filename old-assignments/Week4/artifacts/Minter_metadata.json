@@ -1,0 +1,124 @@
+{
+	"compiler": {
+		"version": "0.8.15+commit.e14f2714"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "txOrigin",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "Mint",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "adr",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getTotalSupply",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "mint",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Week4/Minter.sol": "Minter"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/Week4/ERC20.sol": {
+			"keccak256": "0x9125a427d71e93537601f5671d6c388f566489e167dda00d619c1ec92ac53ec3",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://42a6df16fc1a69188b26d337687f60a07fe1f2c71ff2a49ff2ff7fd6ef32491e",
+				"dweb:/ipfs/QmdUhduULSE8aQaTN77p3HENu2ajxEV7AT5EZ8dF3fouGD"
+			]
+		},
+		"contracts/Week4/Minter.sol": {
+			"keccak256": "0x3fb356341667b845cddb3d486f38e10b68ebe6f80bf9871e641e3920a805d831",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://845e7b16bacc2fa4303a4a0fd6a67bc482ee7dd10df290168c9a627cb1faec5f",
+				"dweb:/ipfs/QmQP487F2M5878kzyrwxt2gynUvPMAC37nMjhoPkJXhBHc"
+			]
+		}
+	},
+	"version": 1
+}
