@@ -113,6 +113,8 @@ contract WETH9Test is Test {
         emit Deposit(user1, 1 ether);
 
         address(weth9).call{value: 1 ether}("");
+        assertEq(weth9.balanceOf(user1), 1 ether);
+        assertEq(weth9.totalSupply(), 1 ether);
     }
 
     function testBurn() public {
