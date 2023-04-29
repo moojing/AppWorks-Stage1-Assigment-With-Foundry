@@ -112,7 +112,8 @@ contract WETH9Test is Test {
         vm.expectEmit(true, false, false, true);
         emit Deposit(user1, 1 ether);
 
-        address(weth9).call{value: 1 ether}("");
+        (bool success, ) = address(weth9).call{value: 1 ether}("");
+        assertEq(success, true);
         assertEq(weth9.balanceOf(user1), 1 ether);
         assertEq(weth9.totalSupply(), 1 ether);
     }
