@@ -1,3 +1,4 @@
+pragma solidity ^0.8.19;
 import {SafeMath} from "./SafeMath.sol";
 import {AbstractFiatTokenV1} from "./AbstractFiatTokenV1.sol";
 import {EIP3009} from "./EIP3009.sol";
@@ -367,6 +368,7 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
         uint256 value
     )
         external
+        virtual
         override
         whenNotPaused
         notBlacklisted(msg.sender)

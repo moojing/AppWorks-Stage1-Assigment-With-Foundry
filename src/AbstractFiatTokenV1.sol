@@ -1,4 +1,4 @@
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 import {IERC20} from "./IERC20.sol";
 
 abstract contract AbstractFiatTokenV1 is IERC20 {

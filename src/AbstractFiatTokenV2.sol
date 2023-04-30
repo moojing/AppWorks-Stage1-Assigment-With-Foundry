@@ -23,7 +23,7 @@ import {AbstractFiatTokenV1} from "./AbstractFiatTokenV1.sol";
  * SOFTWARE.
  */
 
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 
 abstract contract AbstractFiatTokenV2 is AbstractFiatTokenV1 {
     function _increaseAllowance(

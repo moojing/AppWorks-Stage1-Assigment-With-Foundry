@@ -1,3 +1,4 @@
+pragma solidity ^0.8.19;
 import {Ownable} from "./Ownable.sol";
 import {SafeERC20} from "./SafeERC20.sol";
 import {IERC20} from "./IERC20.sol";

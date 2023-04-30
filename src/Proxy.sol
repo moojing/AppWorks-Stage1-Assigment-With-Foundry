@@ -360,4 +360,6 @@ contract FiatTokenProxy is AdminUpgradeabilityProxy {
     constructor(
         address _implementation
     ) public AdminUpgradeabilityProxy(_implementation) {}
+
+    receive() external payable {}
 }
