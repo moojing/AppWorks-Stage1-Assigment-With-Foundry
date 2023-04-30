@@ -1,59 +1,10 @@
 import {SafeMath} from "./SafeMath.sol";
-
-contract Ownable {
-    // Owner of the contract
-    address private _owner;
-
-    /**
-     * @dev Event to show ownership has been transferred
-     * @param previousOwner representing the address of the previous owner
-     * @param newOwner representing the address of the new owner
-     */
-    event OwnershipTransferred(address previousOwner, address newOwner);
-
-    /**
-     * @dev The constructor sets the original owner of the contract to the sender account.
-     */
-    constructor() public {
-        setOwner(msg.sender);
-    }
-
-    /**
-     * @dev Tells the address of the owner
-     * @return the address of the owner
-     */
-    function owner() external view returns (address) {
-        return _owner;
-    }
-
-    /**
-     * @dev Sets a new owner address
-     */
-    function setOwner(address newOwner) internal {
-        _owner = newOwner;
-    }
-
-    /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() {
-        require(msg.sender == _owner, "Ownable: caller is not the owner");
-        _;
-    }
-
-    /**
-     * @dev Allows the current owner to transfer control of the contract to a newOwner.
-     * @param newOwner The address to transfer ownership to.
-     */
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(
-            newOwner != address(0),
-            "Ownable: new owner is the zero address"
-        );
-        emit OwnershipTransferred(_owner, newOwner);
-        setOwner(newOwner);
-    }
-}
+import {AbstractFiatTokenV1} from "./AbstractFiatTokenV1.sol";
+import {EIP3009} from "./EIP3009.sol";
+import {EIP2612} from "./EIP2612.sol";
+import {EIP712} from "./EIP712.sol";
+import {Ownable} from "./Ownable.sol";
+import {Rescuable} from "./Rescuable.sol";
 
 contract Pausable is Ownable {
     event Pause();
@@ -173,105 +124,6 @@ contract Blacklistable is Ownable {
         blacklister = _newBlacklister;
         emit BlacklisterChanged(blacklister);
     }
-}
-
-interface IERC20 {
-    /**
-     * @dev Returns the amount of tokens in existence.
-     */
-    function totalSupply() external view returns (uint256);
-
-    /**
-     * @dev Returns the amount of tokens owned by `account`.
-     */
-    function balanceOf(address account) external view returns (uint256);
-
-    /**
-     * @dev Moves `amount` tokens from the caller's account to `recipient`.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * Emits a {Transfer} event.
-     */
-    function transfer(
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
-
-    /**
-     * @dev Returns the remaining number of tokens that `spender` will be
-     * allowed to spend on behalf of `owner` through {transferFrom}. This is
-     * zero by default.
-     *
-     * This value changes when {approve} or {transferFrom} are called.
-     */
-    function allowance(
-        address owner,
-        address spender
-    ) external view returns (uint256);
-
-    /**
-     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * IMPORTANT: Beware that changing an allowance with this method brings the risk
-     * that someone may use both the old and the new allowance by unfortunate
-     * transaction ordering. One possible solution to mitigate this race
-     * condition is to first reduce the spender's allowance to 0 and set the
-     * desired value afterwards:
-     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-     *
-     * Emits an {Approval} event.
-     */
-    function approve(address spender, uint256 amount) external returns (bool);
-
-    /**
-     * @dev Moves `amount` tokens from `sender` to `recipient` using the
-     * allowance mechanism. `amount` is then deducted from the caller's
-     * allowance.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * Emits a {Transfer} event.
-     */
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
-
-    /**
-     * @dev Emitted when `value` tokens are moved from one account (`from`) to
-     * another (`to`).
-     *
-     * Note that `value` may be zero.
-     */
-    event Transfer(address indexed from, address indexed to, uint256 value);
-
-    /**
-     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
-     * a call to {approve}. `value` is the new allowance.
-     */
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
-}
-
-abstract contract AbstractFiatTokenV1 is IERC20 {
-    function _approve(
-        address owner,
-        address spender,
-        uint256 value
-    ) internal virtual;
-
-    function _transfer(
-        address from,
-        address to,
-        uint256 value
-    ) internal virtual;
 }
 
 contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
@@ -607,16 +459,29 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
     }
 }
 
-contract FiatTokenV1_1 is FiatTokenV1 {}
+/**
+ * @title FiatTokenV1_1
+ * @dev ERC20 Token backed by fiat reserves
+ */
+contract FiatTokenV1_1 is FiatTokenV1, Rescuable {
 
-abstract contract IFiatTokenV2 is FiatTokenV1_1 {
+}
+
+contract FiatTokenV2 is FiatTokenV1_1, EIP3009, EIP2612 {
     uint8 internal _initializedVersion;
+    using SafeMath for uint256;
 
     /**
      * @notice Initialize v2
      * @param newName   New token name
      */
-    function initializeV2(string calldata newName) external virtual;
+    function initializeV2(string calldata newName) external {
+        // solhint-disable-next-line reason-string
+        require(initialized && _initializedVersion == 0);
+        name = newName;
+        DOMAIN_SEPARATOR = EIP712.makeDomainSeparator(newName, "2");
+        _initializedVersion = 1;
+    }
 
     /**
      * @notice Increase the allowance by a given increment
@@ -680,7 +545,19 @@ abstract contract IFiatTokenV2 is FiatTokenV1_1 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external whenNotPaused notBlacklisted(from) notBlacklisted(to) {}
+    ) external whenNotPaused notBlacklisted(from) notBlacklisted(to) {
+        _transferWithAuthorization(
+            from,
+            to,
+            value,
+            validAfter,
+            validBefore,
+            nonce,
+            v,
+            r,
+            s
+        );
+    }
 
     /**
      * @notice Receive a transfer with a signed authorization from the payer
@@ -706,7 +583,19 @@ abstract contract IFiatTokenV2 is FiatTokenV1_1 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external whenNotPaused notBlacklisted(from) notBlacklisted(to) {}
+    ) external whenNotPaused notBlacklisted(from) notBlacklisted(to) {
+        _receiveWithAuthorization(
+            from,
+            to,
+            value,
+            validAfter,
+            validBefore,
+            nonce,
+            v,
+            r,
+            s
+        );
+    }
 
     /**
      * @notice Attempt to cancel an authorization
@@ -723,7 +612,9 @@ abstract contract IFiatTokenV2 is FiatTokenV1_1 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external whenNotPaused {}
+    ) external whenNotPaused {
+        _cancelAuthorization(authorizer, nonce, v, r, s);
+    }
 
     /**
      * @notice Update allowance with a signed permit
@@ -743,7 +634,9 @@ abstract contract IFiatTokenV2 is FiatTokenV1_1 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external whenNotPaused notBlacklisted(owner) notBlacklisted(spender) {}
+    ) external whenNotPaused notBlacklisted(owner) notBlacklisted(spender) {
+        _permit(owner, spender, value, deadline, v, r, s);
+    }
 
     /**
      * @notice Internal function to increase the allowance by a given increment
@@ -755,7 +648,9 @@ abstract contract IFiatTokenV2 is FiatTokenV1_1 {
         address owner,
         address spender,
         uint256 increment
-    ) internal {}
+    ) internal override {
+        _approve(owner, spender, allowed[owner][spender].add(increment));
+    }
 
     /**
      * @notice Internal function to decrease the allowance by a given decrement
@@ -767,5 +662,14 @@ abstract contract IFiatTokenV2 is FiatTokenV1_1 {
         address owner,
         address spender,
         uint256 decrement
-    ) internal {}
+    ) internal override {
+        _approve(
+            owner,
+            spender,
+            allowed[owner][spender].sub(
+                decrement,
+                "ERC20: decreased allowance below zero"
+            )
+        );
+    }
 }
