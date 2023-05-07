@@ -3,6 +3,9 @@ solc-version = "0.8.19"
 src = 'src'
 out = 'out'
 libs = ['lib']
-remappings = ['openzeppelin-erc20/=lib/openzeppelin-contracts/contracts/token/ERC20/',
-'openzeppelin-ownable/=lib/openzeppelin-contracts/contracts/access']
+remappings = [
+  '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/',
+  'openzeppelin-erc20/=lib/openzeppelin-contracts/contracts/token/ERC20/',
+  'openzeppelin-ownable/=lib/openzeppelin-contracts/contracts/access/',
+  'exo-digital-labs/=lib/ERC721R/contracts/']
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
