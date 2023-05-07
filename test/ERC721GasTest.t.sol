@@ -53,6 +53,7 @@ contract ERC721GasTest is Test {
         vm.startPrank(user1);
         tokenEnumerable.safeMint{value: 0.1 ether}(10);
         tokenEnumerable.approve(user2, 1);
+        assertEq(tokenEnumerable.getApproved(1), user2);
         vm.stopPrank();
     }
 
@@ -61,6 +62,7 @@ contract ERC721GasTest is Test {
         vm.startPrank(user1);
         token.safeMint{value: 0.1 ether}(10);
         token.approve(user2, 0);
+        assertEq(token.getApproved(0), user2);
         vm.stopPrank();
     }
 
@@ -69,6 +71,7 @@ contract ERC721GasTest is Test {
         vm.startPrank(user1);
         tokenEnumerable.safeMint{value: 0.1 ether}(10);
         tokenEnumerable.safeTransferFrom(user1, user2, 1);
+        assertEq(tokenEnumerable.tokenOfOwnerByIndex(user2, 0), 1);
         vm.stopPrank();
     }
 
@@ -77,6 +80,7 @@ contract ERC721GasTest is Test {
         vm.startPrank(user1);
         token.safeMint{value: 0.1 ether}(10);
         token.safeTransferFrom(user1, user2, 0);
+        assertEq(token.ownerOf(0), user2);
         vm.stopPrank();
     }
 }
